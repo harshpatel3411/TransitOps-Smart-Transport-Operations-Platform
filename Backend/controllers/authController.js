@@ -24,6 +24,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email,password , "ewjnewffn")
   try {
     const [users] = await db.execute('SELECT u.*, r.name as role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE email = ?', [email]);
     if (users.length === 0 || !(await bcrypt.compare(password, users[0].password_hash))) {

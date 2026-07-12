@@ -8,21 +8,28 @@ const maintenanceRoutes = require('./routes/maintenanceRoutes');
 const logRoutes = require('./routes/logRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/vehicles', vehicleRoutes);
-app.use('/trips', tripRoutes);
-app.use('/dashboard', dashboardRoutes);
-app.use('/reports', reportRoutes);
-app.use('/drivers', driverRoutes);
-app.use('/maintenance', maintenanceRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/trips', tripRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/drivers', driverRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api', logRoutes);
+app.use('/api/logs', logRoutes);
 app.use('/logs', logRoutes);
 
 const PORT = process.env.PORT || 3000;

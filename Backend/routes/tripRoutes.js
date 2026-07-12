@@ -3,6 +3,7 @@ const router = express.Router();
 const tripController = require('../controllers/tripController');
 const { protect } = require('../middleware/authMiddleware');
 
+router.get('/', protect, tripController.getTrips);
 router.post('/', protect, tripController.createTrip);
 router.put('/:id/dispatch', protect, tripController.dispatchTrip);
 router.put('/:id/complete', protect, tripController.completeTrip);

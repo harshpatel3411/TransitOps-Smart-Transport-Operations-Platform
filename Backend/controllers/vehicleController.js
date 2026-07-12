@@ -12,13 +12,24 @@ exports.getAllVehicles = async (req, res) => {
 
 // POST /vehicles
 exports.createVehicle = async (req, res) => {
-  const { registration_number, name_model, type, max_load_capacity, acquisition_cost, region } = req.body;
+  const { registration_number, name_model, type, max_load_capacity, acquisition_cost, region, status, odometer } = req.body;
   try {
+    if (!registration_number || !name_model || !type || max_load_capacity === undefined || acquisition_cost === undefined) {
+      return res.status(400).json({ success: false, message: 'Registration number, model, type, load capacity, and acquisition cost are required.' });
+    }
+
+    const [existing] = await db.execute('SELECT id FROM vehicles WHERE registration_number = ?', [registration_number]);
+    if (existing.length > 0) {
+      return res.status(409).json({ success: false, message: 'A vehicle with this registration number already exists.' });
+    }
+
     const [result] = await db.execute(
-      'INSERT INTO vehicles (registration_number, name_model, type, max_load_capacity, acquisition_cost, region) VALUES (?, ?, ?, ?, ?, ?)',
-      [registration_number, name_model, type, max_load_capacity, acquisition_cost, region]
+      'INSERT INTO vehicles (registration_number, name_model, type, max_load_capacity, acquisition_cost, region, status, odometer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [registration_number, name_model, type, max_load_capacity, acquisition_cost, region || '', status || 'Available', odometer || 0]
     );
-    res.status(201).json({ success: true, data: { id: result.insertId } });
+
+    const [rows] = await db.execute('SELECT * FROM vehicles WHERE id = ?', [result.insertId]);
+    res.status(201).json({ success: true, data: rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
